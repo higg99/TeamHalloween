@@ -1,6 +1,6 @@
 #define DB_PIN  19
 
-#define FOG_T  4000
+#define FOG_T  5000
 #define SKUL_T 5000
 #define SKEL_T 25000
 #define REEP_T 17000
@@ -39,7 +39,7 @@ void trigger(int pin, int time=100){
   digitalWrite(pin,LOW);
 }
 
-void atrigger(int* pin,int len,int time = 100){
+void atrigger(int* pin,int len,int time = 5000){
   for(int p=0; p< len; p++){
     digitalWrite(pin[p], HIGH);
   }
@@ -50,13 +50,22 @@ void atrigger(int* pin,int len,int time = 100){
 }
 
 void DB(){
-  int taf[3];
-  DB_state = true;
-  taf[0] = FOG1_P;
-  taf[1] = FOG2_P;
-  taf[2] = FOG3_P;
-  trigger(SKUL_P,150);
-  atrigger(taf,3, FOG_T);
+  if(DB_state){
+    unsigned long start = millis();
+    digitalWrite(SKUL_P, HIGH);
+    return;
+  }else{
+    //int taf[3];
+    DB_state = true;
+    /*
+    taf[0] = FOG1_P;
+    taf[1] = FOG2_P;
+    taf[2] = FOG3_P;
+    trigger(SKUL_P,150);
+    //delay(40000);
+    atrigger(taf,3, FOG_T);
+    */
+  }
 }
 /*
 const uint16_t my_pids[] = {E120_DEVICE_HOURS, E120_LAMP_HOURS};
@@ -71,11 +80,11 @@ struct RDMINIT rdmInit = {
 */
 void show(){
   
-  //ta[0] = FOG1_P;
-  //ta[1] = FOG2_P;
-  //ta[2] = FOG3_P;
-  //trigger(SKUL_P,150);
-  //atrigger(ta,3, FOG_T);
+  ta[0] = FOG1_P;
+  ta[1] = FOG2_P;
+  ta[2] = FOG3_P;
+  trigger(SKUL_P,150);
+  atrigger(ta,3, FOG_T);
   //Serial.println("Skull and Fog");
   //delay(SKUL_T);
   //ta[0] = SKEL1_P;
@@ -85,29 +94,38 @@ void show(){
   //delay(SKEL_T);
   trigger(BBONES_P);
   delay(BBONES_T);
+  digitalWrite(SKUL_P,LOW);
   if(show_cnt == 0){
     trigger(REEP_P);
     delay(REEP_T);
+    digitalWrite(SKUL_P,LOW);
     trigger(SPI_P);
     delay(SPI_T);
+    digitalWrite(SKUL_P,LOW);
     show_cnt++;
   }else if(show_cnt == 1){
     trigger(SKEL2_P);
-    delay(SKELT);
+    delay(SKEL_T);
+    digitalWrite(SKUL_P,LOW);
     trigger(EDDY_P);
     delay(EDDY_T);
+    digitalWrite(SKUL_P,LOW);
     show_cnt++;
   }else if(show_cnt ==2){
     trigger(BAR_P);
     delay(BAR_T);
+    digitalWrite(SKUL_P,LOW);
     trigger(MAID_P);
     delay(MAID_T);
+    digitalWrite(SKUL_P,LOW);
     show_cnt++;
   }else{
     trigger(SAM_P);
-    delay(SAM_T)
+    delay(SAM_T);
+    digitalWrite(SKUL_P,LOW);
     trigger(MARS_P);
     delay(MARS_T);
+    digitalWrite(SKUL_P,LOW);
     show_cnt = 0;
   }
 }
@@ -141,5 +159,6 @@ void loop() {
   if(DB_state){
     show();
     DB_state = false;
+    digitalWrite(SKUL_P,LOW);
   }
 }
