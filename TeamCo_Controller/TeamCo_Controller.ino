@@ -1,28 +1,73 @@
 #define DB_PIN  19
 
-#include <DMXSerial2.h>
+#define FOG_T  5000
+#define SKUL_T 5000
+#define SKEL_T 25000
+#define REEP_T 17000
+#define SAM_T  25000
+#define BAR_T  23000
+#define MAID_T 19000
+#define EDDY_T 20000
+#define MARS_T 25000
+#define SPI_T  15000
+#define BBONES_T 25000
+
+
+#define FOG1_P 44
+#define FOG2_P 45
+#define FOG3_P 43
+#define SKUL_P 22
+//#define SKEL1_P 23
+#define SKEL2_P 24
+//#define SKEL2_P 42
+#define REEP_P 25
+#define SAM_P  26
+#define BAR_P  27
+#define MAID_P 28
+#define EDDY_P 29
+#define MARS_P 30
+#define SPI_P  31
+#define BBONES_P 23
+
+//#include <DMXSerial2.h>
 bool DB_state=false;
-
-
-void trigger(int pin){
+int ta[32];
+int show_cnt = 0;
+void trigger(int pin, int time=100){
   digitalWrite(pin, HIGH);
-  delay(100);
+  delay(time);
   digitalWrite(pin,LOW);
 }
 
-void atrigger(int* pin,int len){
+void atrigger(int* pin,int len,int time = 5000){
   for(int p=0; p< len; p++){
     digitalWrite(pin[p], HIGH);
   }
-  delay(100);
-  for(int p=0; p< sizeof(pin); p++){
+  delay(time);
+  for(int p=0; p< len; p++){
     digitalWrite(pin[p], LOW);
   }
 }
 
 void DB(){
-  DB_state = true;
+  if(DB_state){
+    unsigned long start = millis();
+    digitalWrite(SKUL_P, HIGH);
+    return;
+  }else{
+    //int taf[3];
+    DB_state = true;
+    /*
+    taf[0] = FOG1_P;
+    taf[1] = FOG2_P;
+    taf[2] = FOG3_P;
+    trigger(SKUL_P,150);
+    //delay(40000);
+    atrigger(taf,3, FOG_T);
+    */
+  }
 }
+/*
 const uint16_t my_pids[] = {E120_DEVICE_HOURS, E120_LAMP_HOURS};
 struct RDMINIT rdmInit = {
   "TeamCo.", // Manufacturer Label
@@ -32,7 +77,60 @@ struct RDMINIT rdmInit = {
   (sizeof(my_pids)/sizeof(uint16_t)), my_pids,
   0, NULL
 };
-int ta[32];
+*/
+void show(){
+  
+  ta[0] = FOG1_P;
+  ta[1] = FOG2_P;
+  ta[2] = FOG3_P;
+  trigger(SKUL_P,150);
+  atrigger(ta,3, FOG_T);
+  //Serial.println("Skull and Fog");
+  //delay(SKUL_T);
+  //ta[0] = SKEL1_P;
+  //ta[1] = SKEL2_P;
+  //atrigger(ta,2,1000);
+  //Serial.println("Skeleton brothers");
+  //delay(SKEL_T);
+  trigger(BBONES_P);
+  delay(BBONES_T);
+  digitalWrite(SKUL_P,LOW);
+  if(show_cnt == 0){
+    trigger(REEP_P);
+    delay(REEP_T);
+    digitalWrite(SKUL_P,LOW);
+    trigger(SPI_P);
+    delay(SPI_T);
+    digitalWrite(SKUL_P,LOW);
+    show_cnt++;
+  }else if(show_cnt == 1){
+    trigger(SKEL2_P);
+    delay(SKEL_T);
+    digitalWrite(SKUL_P,LOW);
+    trigger(EDDY_P);
+    delay(EDDY_T);
+    digitalWrite(SKUL_P,LOW);
+    show_cnt++;
+  }else if(show_cnt ==2){
+    trigger(BAR_P);
+    delay(BAR_T);
+    digitalWrite(SKUL_P,LOW);
+    trigger(MAID_P);
+    delay(MAID_T);
+    digitalWrite(SKUL_P,LOW);
+    show_cnt++;
+  }else{
+    trigger(SAM_P);
+    delay(SAM_T);
+    digitalWrite(SKUL_P,LOW);
+    trigger(MARS_P);
+    delay(MARS_T);
+    digitalWrite(SKUL_P,LOW);
+    show_cnt = 0;
+  }
+}
+
+
 void setup() {
   pinMode(DB_PIN, INPUT_PULLUP);
   for(int p = 22;p<=53; p++){
@@ -40,83 +138,27 @@ void setup() {
      ta[p-22]=p;
   }
   //DMXSerial2.init(&rdmInit, processCommand);
+  /*
   for(int p = 22;p<=53; p++){
      trigger(p);
   }
+  */
   //atrigger(ta,32);
   noInterrupts();
   attachInterrupt(digitalPinToInterrupt(DB_PIN), DB,FALLING);
   interrupts();
+//trigger(34);
+  //show();
+  DB_state = false;
+  Serial.begin(9600); 
+  Serial.println("Waiting for Button press");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   if(DB_state){
-    ta[0] = 22;
-    ta[1] = 23;
-    atrigger(ta,2);
-    delay(0);
-    //trigger(23);
-    delay(100);
-    trigger(24);
-    delay(200);
-    trigger(25);
-    delay(500);
-    trigger(26);
-    delay(100);
-    trigger(27);
-    delay(200);
-    trigger(28);
-    delay(300);
-    trigger(29);
-    delay(100);
-    trigger(30);
-    delay(200);
-    trigger(31);
-    delay(300);
-    trigger(32);
-    delay(500);
-    trigger(33);
-    delay(100);
-    trigger(34);
-    delay(200);
-    trigger(35);
-    delay(300);
-    trigger(36);
-    delay(100);
-    trigger(37);
-    delay(200);
-    trigger(38);
-    delay(300);
-    trigger(39);
-    delay(100);
-    trigger(40);
-    delay(200);
-    trigger(41);
-    delay(300);
-    trigger(42);
-    delay(100);
-    trigger(43);
-    delay(200);
-    trigger(44);
-    delay(500);
-    trigger(45);
-    delay(100);
-    trigger(46);
-    delay(200);
-    trigger(47);
-    delay(500);
-    trigger(48);
-    delay(100);
-    trigger(49);
-    delay(200);
-    trigger(50);
-    delay(300);
-    trigger(51);
-    delay(100);
-    trigger(52);
-    delay(200);
-    trigger(53);
-    DB_state= false;
+    show();
+    DB_state = false;
+    digitalWrite(SKUL_P,LOW);
   }
 }
